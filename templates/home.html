@@ -1,0 +1,96 @@
+{% extends 'main.html' %}
+
+{% block content %}
+
+<form method="POST" action='{% url "results" %}''>
+    {% csrf_token %}
+<style>
+    .home-container{
+        display: grid;
+        grid-template-columns: 1fr 3fr 1fr;
+    }
+</style>
+<div class="home-container">
+
+    <div>
+        <h3> Node Tags</h3>
+
+            <div>
+                <label>all</label>
+                <label class="switch">
+                    <input type="checkbox" checked="true" name="Tag_value" value = "all">
+                    <span class="slider round"></span>
+                </label>
+        </div>
+        {%for tag in tags%}
+             <div>
+                <label>{{tag.name}}</label>
+                <label class="switch">
+                    <input type="checkbox" name="Tag_value" value = {{tag}}>
+                    <span class="slider round"></span>
+                </label>
+            </div>
+            
+        {% endfor %}
+    </div>
+    <div>
+    <h1>Search</h1>
+        <input type="text" name="query">
+        
+        
+        
+        <button type="submit">Search</button> <br>
+        <select name="optionlist">
+            <option>option 1</option>
+            <option>option 2</option>
+            <option>option 3</option>
+            <option> option 4 </option>
+            <option> option 5 </option>
+            </select>
+        <select name="optionlist2">
+            <option>option 1</option>
+            <option>option 2</option>
+            <option>option 3</option>
+            <option> option 4 </option>
+            <option> option 5 </option>
+            </select>
+
+            <br>
+            <br>
+            <br>
+
+
+      {% include 'results_component.html' %}
+    </div>
+
+    <div>
+        <h4>All connected Nodes:</h4>
+        <div>
+            {% for node in nodes %}
+            <div>
+                <small>{{node.data.tag.all|join:", " }}</small>
+                <small>added by {{node.data.added_by}}</small><br>
+                <b>{{node.data.name}}->{{node.data.ip}}:</b>
+                <div>{{node.data.description}}</div>
+                <small>original Tag: {{node.data.ownerTag}} </small>
+                <div> <small>online: {{node.data.onTime|timesince}}</small></div>
+            </div>
+            </br>
+            {% endfor %}
+        </div>
+        <h4>All offline Nodes:</h4>
+        <div>
+            {% for node in offline %}
+            <div>
+                <b>{{node.data.name}}->{{node.data.ip}}:</b>
+                <div>{{node.data.description}}</div>
+                <small>added by {{node.data.added_by}}</small>
+            </div>
+            </br>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+</form>
+{% endblock %}

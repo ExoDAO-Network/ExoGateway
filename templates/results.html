@@ -1,0 +1,30 @@
+{% extends 'main.html' %}
+
+{% block content %}
+<h1>Search</h1>
+<form method="POST" action='{% url "results" %}''>
+    {% csrf_token %}
+    <input type="text" name="query">
+    
+    <button type="submit">Search</button>
+    </form>
+</br>
+</br>
+<div>
+    <div>
+        {% for res in queryresults %}
+        <div>
+        <a href="{{res.link}}">
+            <div>{{res.feed_title}} -- 
+            {{res.logic}}</div>
+            <b>{{res.title}}</b>
+            
+            <div>{{res.match}}
+            </div>{{res.published}} 
+        </a></div>
+        </br>
+        {% endfor %}
+    </div>
+</div>
+
+{% endblock %}
