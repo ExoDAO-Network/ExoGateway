@@ -3,6 +3,7 @@ from.models import SwarmNode, Tag
 from . import RPyC_client as RC
 import xmlrpc.client
 import socket
+import base64
 from .forms import SwarmNodeForm
 from datetime import datetime
 class localNode():
@@ -15,11 +16,17 @@ class localNode():
 cList=[]
 sList =[]
 elist=[]
-
+alltags=[]
 #TODO: move to library file for clarity
 ### business logic ###        
 
-
+def decode_base64(input):
+    base64_string =input
+    base64_bytes = base64_string.encode("ascii")
+    
+    sample_string_bytes = base64.b64decode(base64_bytes + b'==')
+    output_string = sample_string_bytes.decode("ascii")
+    return output_string
 
 def _get_rpc(ip, port):
     a = xmlrpc.client.ServerProxy('http://'+str(ip)+':'+ str(port))
@@ -72,8 +79,10 @@ def home(request):
                 node.save()
                 myNode=localNode(node, c, True)
                 cList.append(myNode)
-                if(any(node==mynode.data for mynode in elist)):
-                    elist.remove(myNode)
+                try:
+                    elist.remove(any(node==mynode.data for mynode in elist))
+                except:
+                    print("nothing to remove")
                 for newIp in details["storedIP"]:
                     newNode = SwarmNode.objects.filter(ip=newIp)
                     if not newNode:
@@ -84,47 +93,32 @@ def home(request):
                 if(not any(node==mynode.data for mynode in elist)):
                     elist.append(myNode)
 
-    tags = Tag.objects.all()
-    context = {'nodes': cList, 'offline':elist, 'tags':tags}
+    alltags = Tag.objects.all()
+
+    socket.setdefaulttimeout(5)        #set the timeout to 0.5 seconds 
+    context = {'nodes': cList, 'offline':elist, 'tags':alltags}
 
 
     return render(request, 'home.html', context)
 
 def results(request):
-
-    query_results = [{"logic": "RSS",
-                        "feed_title": "duckduck",
-                        "title": "blabla",
-                        "link": "http://www.duckduckgo.com",
-                        "published": "1st of February 1999",
-                        "match": "Hit was here __query__"},
-                        {"logic": "RSS",
-                        "feed_title": "NYTimes",
-                        "title": "blabla2",
-                        "link": "http://www.nyt.com",
-                        "published": "1st of February 1999",
-                        "match": "Hit was here __query__"},
-                        {"logic": "RSS",
-                        "feed_title": "wiki",
-                        "title": "blabla3",
-                        "link": "http://www.wikipedia.com",
-                        "published": "1st of February 1999",
-                        "match": "Hit was here __query__"},
-                        ]
+    alltags = Tag.objects.all()
+    query_results = []
     if request.method == 'POST':
         querystr = str(request.POST.get('query', None))
         tags = request.POST.getlist('Tag_value', None)
-        print(tags)
         for Cl in  cList:
             test = 0
             if(('all' in tags) or (str(Cl.data.tag) in tags) or (str(Cl.data.ownerTag) in tags)):
-                try:
-                    test = Cl.rpc.execute_query(querystr) #Cl.root.search_query(querystr)
-                    for res in test:
-                        query_results.append(res)
-                except:
-                    print("error")
+                
+                test = Cl.rpc.execute_query(querystr) #Cl.root.search_query(querystr)
+                for res in test:
+                    print(res)
+                    for key in res:
+                        res[key]=decode_base64(res[key])
+                    query_results.append(res)
+                    print(res)
             
-    context = {'queryresults': query_results}
+    context = {'queryresults': query_results,'nodes': cList, 'offline':elist, 'tags':alltags}
     return render(request, 'results.html', context)
 # Create your views here.
