@@ -2,14 +2,17 @@
 
 {% block content %}
 
-<form method="POST" action='{% url "results" %}''>
+<form method="POST" action='{% url "results" %}'>
     {% csrf_token %}
 <style>
     .home-container{
         display: grid;
         grid-template-columns: 1fr 3fr 1fr;
+        padding-left: 30px;
     }
 </style>
+
+
 <div class="home-container">
 
     <div>
@@ -30,15 +33,15 @@
                     <span class="slider round"></span>
                 </label>
             </div>
-            
+
         {% endfor %}
     </div>
     <div>
     <h1>Search</h1>
         <input type="text" name="query">
-        
-        
-        
+
+
+
         <button type="submit">Search</button> <br>
         <select name="optionlist">
             <option>option 1</option>
@@ -56,12 +59,44 @@
             </select>
 
             <br>
-            <br>
-            <br>
+        <!-- If there are no results, display "No Results" -->
+        {% if queryresults|length == 0 %}
+        <div>
+            <h3>No Results</h3>
+        </div>
+        {% endif %}
+        <!-- If there are results, show number of results-->
+        {% if queryresults|length > 0 %}
+        <div>
+            <h3>Results</h3>
+            <div>
+                <h5>Showing {{queryresults|length}} results</h5>
+            </div>
+        </div>
+        {% endif %}
+
+        <!-- Display the results -->
+        <div>
+            <div>
+                {% for res in queryresults %}
+                <div>
+                    <a href="{{res.link}}">
+                        <div>{{res.feed_title}}
+                            -{{res.logic}}-</div>
+                        <b>{{res.title}}</b>
+
+                        <div>{{res.match}}
+                        </div>{{res.published}}
+                    </a></div>
+                </br>
+                {% endfor %}
+            </div>
+        </div>
 
     </div>
 
-    <div>
+
+        <div>
         <h4>All connected Nodes:</h4>
         <div>
             {% for node in nodes %}
@@ -92,21 +127,4 @@
 </div>
 </form>
 
-
-<div>
-    <div>
-        {% for res in queryresults %}
-        <div>
-        <a href="{{res.link}}">
-            <div>{{res.feed_title}} -- 
-            {{res.logic}}</div>
-            <b>{{res.title}}</b>
-            
-            <div>{{res.match}}
-            </div>{{res.published}} 
-        </a></div>
-        </br>
-        {% endfor %}
-    </div>
-</div>
 {% endblock %}

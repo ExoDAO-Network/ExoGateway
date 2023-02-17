@@ -2,12 +2,13 @@
 
 {% block content %}
 
-<form method="POST" action='{% url "results" %}''>
+<form method="POST" action='{% url "results" %}'>
     {% csrf_token %}
 <style>
     .home-container{
         display: grid;
         grid-template-columns: 1fr 3fr 1fr;
+        padding-left: 30px;
     }
 </style>
 <div class="home-container">
@@ -22,6 +23,7 @@
                     <span class="slider round"></span>
                 </label>
         </div>
+
         {%for tag in tags%}
              <div>
                 <label>{{tag.name}}</label>
@@ -36,9 +38,9 @@
     <div>
     <h1>Search</h1>
         <input type="text" name="query">
-        
-        
-        
+
+
+
         <button type="submit">Search</button> <br>
         <select name="optionlist">
             <option>option 1</option>
