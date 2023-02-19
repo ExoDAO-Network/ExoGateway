@@ -1,96 +1,82 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
+{% load static %}
+<body class="body--main">
+<div class="center">
 <form method="POST" action='{% url "results" %}'>
     {% csrf_token %}
-<style>
-    .home-container{
-        display: grid;
-        grid-template-columns: 1fr 3fr 1fr;
-        padding-left: 30px;
-    }
-</style>
-<div class="home-container">
-
-    <div>
-        <h3> Node Tags</h3>
-
-            <div>
-                <label>all</label>
-                <label class="switch">
-                    <input type="checkbox" checked="true" name="Tag_value" value = "all">
-                    <span class="slider round"></span>
-                </label>
+        <br>
+        <div style="margin-bottom: 5px;">
+             <input class="input--pill" name="query" placeholder="Enter Query" />
+             <button class="btn--pill"  type="submit">Search</button> 
         </div>
-
-        {%for tag in tags%}
-             <div>
-                <label>{{tag.name}}</label>
-                <label class="switch">
-                    <input type="checkbox" name="Tag_value" value = {{tag}}>
-                    <span class="slider round"></span>
-                </label>
-            </div>
+        
+        <div class="select">
             
-        {% endfor %}
-    </div>
-    <div>
-    <h1>Search</h1>
-        <input type="text" name="query">
-
-
-
-        <button type="submit">Search</button> <br>
-        <select name="optionlist">
-            <option>option 1</option>
-            <option>option 2</option>
-            <option>option 3</option>
-            <option> option 4 </option>
-            <option> option 5 </option>
-            </select>
-        <select name="optionlist2">
-            <option>option 1</option>
-            <option>option 2</option>
-            <option>option 3</option>
-            <option> option 4 </option>
-            <option> option 5 </option>
+            <!-- Select box 1: Normalization options -->
+            <select name="normalization">
+            <option value="CosineNormalization">CosineNormalization</option>
+            <option value="Unnormalized">Unnormalized</option>
+            <option value="NoNormalization">NoNormalization</option>
+            <option value="MaxNormalization">MaxNormalization</option>
+            <option value="LogNormalization">LogNormalization</option>
+            <option value="BytesNormalization">BytesNormalization</option>
+            <option value="preCosineMetricNormalization">preCosineMetricNormalization</option>
+            <option value="CosineMetricNormalization">CosineMetricNormalization</option>
             </select>
 
+            <!-- Select box 2: Sorting options -->  
+            <select name="sorting">
+            <option value="ByNewsrank">ByNewsrank</option>
+            <option value="Unsorted">Unsorted</option>
+            <option value="ByDate">ByDate</option>
+            <option value="ByReverseDate">ByReverseDate</option>
+            <option value="ByScore">ByScore</option>
+            <option value="ByAdjScore">ByAdjScore</option>
+            <option value="ByAuxCount">ByAuxCount</option>
+            <option value="ByHits">ByHits</option>
+            <option value="ByReverseHits">ByReverseHits</option>
+            <option value="ByKey">ByKey</option>
+            <option value="ByIndex">ByIndex</option>
+            <option value="ByCategory">ByCategory</option>
+            </select>
+
+
+        </div>
+
             <br>
+            <br>
+            <br>
+            <br>
+            <h5> Active Nodes:</h5>
             <br>
             <br>
 
-    </div>
 
     <div>
-        <h4>All connected Nodes:</h4>
         <div>
-            {% for node in nodes %}
             <div>
-                <small>{{node.data.tag.all|join:", " }}</small>
-                <small>added by {{node.data.added_by}}</small><br>
-                <b>{{node.data.name}}->{{node.data.ip}}:</b>
-                <div>{{node.data.description}}</div>
-                <small>original Tag: {{node.data.ownerTag}} </small>
-                <div> <small>online: {{node.data.onTime|timesince}}</small></div>
+                {% for node in nodes %}
+                <div class="hvr-pulse">
+                        <div class="tooltip">
+                            <span class="tooltiptext2">
+                            <b>{{node.data.name}}->{{node.data.ownerTag}}</b>
+                            <div>{{node.data.description}}</div>
+                            <small>under: {{node.data.ip}}:  </small>
+                            <div> <small>online: {{node.data.onTime|timesince}}</small></div>
+                            <small>added by {{node.data.added_by}}</small><br>
+                        </span>
+                    </div>
+                </div>
+                </br>
+                {% endfor %}
             </div>
-            </br>
-            {% endfor %}
-        </div>
-        <h4>All offline Nodes:</h4>
-        <div>
-            {% for node in offline %}
-            <div>
-                <b>{{node.data.name}}->{{node.data.ip}}:</b>
-                <div>{{node.data.description}}</div>
-                <small>added by {{node.data.added_by}}</small>
-            </div>
-            </br>
-            {% endfor %}
         </div>
     </div>
+
+</form>
 
 </div>
-</form>
+</body>
 {% endblock %}

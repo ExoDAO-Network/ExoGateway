@@ -1,7 +1,7 @@
 {% extends 'main.html' %}
 
 {% block content %}
-
+{% load static %}
 <form method="POST" action='{% url "results" %}'>
     {% csrf_token %}
 <style>
@@ -12,51 +12,74 @@
     }
 </style>
 
-
 <div class="home-container">
 
     <div>
-        <h3> Node Tags</h3>
+        <h3> Select Node Tags</h3>
 
-            <div>
-                <label>all</label>
-                <label class="switch">
-                    <input type="checkbox" checked="true" name="Tag_value" value = "all">
-                    <span class="slider round"></span>
-                </label>
+            <div id="checklist">
+                <article class="feature1">
+                    <input type="checkbox" name="Tag_value" value = "all" {% if "all" in selected_tags %}checked{% endif %}/>
+                    <div>
+                      <span>
+                        all
+                      </span>
+                    </div>
+                  </article>
         </div>
         {%for tag in tags%}
              <div>
-                <label>{{tag.name}}</label>
-                <label class="switch">
-                    <input type="checkbox" name="Tag_value" value = {{tag}}>
-                    <span class="slider round"></span>
-                </label>
+                <article class="feature1">
+                    <input type="checkbox" name="Tag_value" value = {{tag}} {% if tag.name in selected_tags %}checked{% endif %}/>
+                    <div>
+                      <span>
+                        {{tag}}
+                      </span>
+                    </div>
+                  </article>
             </div>
 
         {% endfor %}
     </div>
     <div>
-    <h1>Search</h1>
-        <input type="text" name="query">
+        <div class="center">
+            <div style="margin-bottom: 5px;">
+                <input class="input--pill" name="query" value="{{ query }}" />
+                <button class="btn--pill"  type="submit">Search</button> 
+            </div>
+            <div class="select">
+                <!-- Select box 1: Normalization options -->
+                <select name="normalization" onchange="this.form.submit()">
+                    <option value="CosineNormalization"{% if selected_normalization == "CosineNormalization" %} selected{% endif %}>CosineNormalization</option>
+                    <option value="Unnormalized"{% if selected_normalization == "Unnormalized" %} selected{% endif %}>Unnormalized</option>
+                    <option value="NoNormalization"{% if selected_normalization == "NoNormalization" %} selected{% endif %}>NoNormalization</option>
+                    <option value="MaxNormalization"{% if selected_normalization == "MaxNormalization" %} selected{% endif %}>MaxNormalization</option>
+                    <option value="LogNormalization"{% if selected_normalization == "LogNormalization" %} selected{% endif %}>LogNormalization</option>
+                    <option value="BytesNormalization"{% if selected_normalization == "BytesNormalization" %} selected{% endif %}>BytesNormalization</option>
+                    <option value="preCosineMetricNormalization"{% if selected_normalization == "preCosineMetricNormalization" %} selected{% endif %}>preCosineMetricNormalization</option>
+                    <option value="CosineMetricNormalization"{% if selected_normalization == "CosineMetricNormalization" %} selected{% endif %}>CosineMetricNormalization</option>
+                    <option value="UndefinedNormalization"{% if selected_normalization == "UndefinedNormalization" %} selected{% endif %}>UndefinedNormalization</option>
+                </select>
 
+                <!-- Select box 2: Sorting options -->
+                <select name="sorting" onchange="this.form.submit()">
 
+                    <option value="ByNewsrank"{% if selected_sorting == "ByNewsrank" %} selected{% endif %}>ByNewsrank</option>
+                    <option value="Unsorted"{% if selected_sorting == "Unsorted" %} selected{% endif %}>Unsorted</option>
+                    <option value="ByDate"{% if selected_sorting == "ByDate" %} selected{% endif %}>ByDate</option>
+                    <option value="ByReverseDate"{% if selected_sorting == "ByReverseDate" %} selected{% endif %}>ByReverseDate</option>
+                    <option value="ByScore"{% if selected_sorting == "ByScore" %} selected{% endif %}>ByScore</option>
+                    <option value="ByAdjScore"{% if selected_sorting == "ByAdjScore" %} selected{% endif %}>ByAdjScore</option>
+                    <option value="ByAuxCount"{% if selected_sorting == "ByAuxCount" %} selected{% endif %}>ByAuxCount</option>
+                    <option value="ByHits"{% if selected_sorting == "ByHits" %} selected{% endif %}>ByHits</option>
+                    <option value="ByReverseHits"{% if selected_sorting == "ByReverseHits" %} selected{% endif %}>ByReverseHits</option>
+                    <option value="ByKey"{% if selected_sorting == "ByKey" %} selected{% endif %}>ByKey</option>
+                    <option value="ByIndex"{% if selected_sorting == "ByIndex" %} selected{% endif %}>ByIndex</option>
+                    <option value="ByCategory"{% if selected_sorting == "ByCategory" %} selected{% endif %}>ByCategory</option>
+                </select>
 
-        <button type="submit">Search</button> <br>
-        <select name="optionlist">
-            <option>option 1</option>
-            <option>option 2</option>
-            <option>option 3</option>
-            <option> option 4 </option>
-            <option> option 5 </option>
-            </select>
-        <select name="optionlist2">
-            <option>option 1</option>
-            <option>option 2</option>
-            <option>option 3</option>
-            <option> option 4 </option>
-            <option> option 5 </option>
-            </select>
+            </div>
+        </div>
 
             <br>
         <!-- If there are no results, display "No Results" -->
@@ -68,9 +91,10 @@
         <!-- If there are results, show number of results-->
         {% if queryresults|length > 0 %}
         <div>
-            <h3>Results</h3>
             <div>
-                <h5>Showing {{queryresults|length}} results</h5>
+                <h5>Showing {{queryresults|length}} results for "{{query}}", [ {{selected_normalization}} ],  [ {{selected_sorting}} ]</h5>
+                <hr width="90%">
+                <br>
             </div>
         </div>
         {% endif %}
@@ -80,13 +104,16 @@
             <div>
                 {% for res in queryresults %}
                 <div>
-                    <a href="{{res.link}}">
+                    <a class="btn--link" href="{{res.link}}">
                         <div>{{res.feed_title}}
-                            -{{res.logic}}-</div>
+                            => {{res.logic}} from: {{res.node.data.name}}</div>
                         <b>{{res.title}}</b>
 
                         <div>{{res.match}}
-                        </div>{{res.published}}
+                        </div>
+                        <span class="date">{{res.published}}</span>
+                        
+                        
                     </a></div>
                 </br>
                 {% endfor %}
@@ -95,36 +122,47 @@
 
     </div>
 
-
         <div>
-        <h4>All connected Nodes:</h4>
+        <h4>{{ nodes|length }} connected Nodes:</h4>
         <div>
             {% for node in nodes %}
-            <div>
-                <small>{{node.data.tag.all|join:", " }}</small>
-                <small>added by {{node.data.added_by}}</small><br>
-                <b>{{node.data.name}}->{{node.data.ip}}:</b>
+            <div class="tooltip">
+
+                <b>{{node.data.name}}->{{node.data.ownerTag}}</b>
+                <span class="tooltiptext">
                 <div>{{node.data.description}}</div>
-                <small>original Tag: {{node.data.ownerTag}} </small>
+                <small>under: {{node.data.ip}}:  </small>
                 <div> <small>online: {{node.data.onTime|timesince}}</small></div>
-            </div>
+                <small>added by {{node.data.added_by}}</small><br>
+            </span>
+        </div>
             </br>
             {% endfor %}
         </div>
-        <h4>All offline Nodes:</h4>
-        <div>
-            {% for node in offline %}
-            <div>
-                <b>{{node.data.name}}->{{node.data.ip}}:</b>
-                <div>{{node.data.description}}</div>
-                <small>added by {{node.data.added_by}}</small>
-            </div>
-            </br>
-            {% endfor %}
-        </div>
+        <h4>{{ offline|length }} offline Nodes</h4>
     </div>
 
 </div>
 </form>
-
+<script>
+    const dateElements = document.querySelectorAll(".date");
+    dateElements.forEach(function(dateElement) {
+    const dateString = dateElement.textContent;
+    const year = Number(dateString.slice(0, 4));
+    const month = Number(dateString.slice(4, 6))-1; // Subtract 1 to convert from 1-based to 0-based month
+    const day = Number(dateString.slice(6, 8));
+    const hours = Number(dateString.slice(9, 11));
+    const minutes = Number(dateString.slice(12, 14));
+    const seconds = Number(dateString.slice(15, 17));
+    const date = new Date(year, month, day, hours, minutes, seconds); // Create a date object
+    if (isNaN(date)) {
+        document.getElementById('date').textContent = dateString;
+    } 
+    else {
+        const formattedDate = date.toLocaleString(); // Change the format to a local date/time string
+      dateElement.textContent = formattedDate; // Update the <span> element with the formatted date
+   
+    }
+});
+  </script>
 {% endblock %}

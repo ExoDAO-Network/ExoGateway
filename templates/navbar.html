@@ -1,5 +1,12 @@
 {% load static %}
+<header class="header">
+    <div class="center">
+        <a href="{% url 'home'%}"  class="header__logo">
+           
+                <img src="{% static 'images/ExoDAO_Logo.png' %}" alt="logo" height="300">
+           
+        </a>
+        
+    </div>
+</header>
 
-<a href="{% url 'home'%}">
-    <img src="{% static 'images/ExoDAO_Logo.png' %}" alt="logo" height="90">
-</a>
