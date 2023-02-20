@@ -55,7 +55,13 @@ def check_node_connections(nodes, IPset, port=18861):
     for node in nodes:
         IPset.add(str(node.ip))  #extract ipset from db for sharing with nodes
     for Cl in cList:               #check if node is still connected
-        if(not Cl.rpc.con_test()):
+        try:
+            if(not Cl.rpc.con_test()):
+                elist.append(Cl)
+                cList.remove(Cl)
+        
+        except Exception as e:
+            print("Error in Service: ", Cl.data.name, str(e))
             elist.append(Cl)
             cList.remove(Cl)
     for node in nodes:
