@@ -16,35 +16,12 @@
 ![Screen Shot](https://raw.githubusercontent.com/ExoDAO-Network/ExoGateway/main/static/images/ExoGatewayShowcase.png)
 
 
-## Getting Started
-
--
-
-### Prerequisites
-
--
-
-### Installation
-
--
-
-## Contributing
-
--
-
-### Creating A Pull Request
-
-
-
 ## License
 
 Distributed under the Apache 2.0 License. See [LICENSE](https://github.com/ExoDAO-Network/ExoGateway/blob/main/LICENSE) for more information.
-
-## Authors
 
 
 ## Acknowledgements
 
 * [Prototype Fund CH](https://prototypefund.opendata.ch)
-* []()
-* []()
+* [ETH Student Project House](https://sph.ethz.ch)
